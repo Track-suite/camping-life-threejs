@@ -35,6 +35,9 @@ const gui = new dat.GUI();
        child.material.envMap = environmentMap;
        child.material.envMapIntensity = 1.5;
        child.material.envMapIntensity = debugObject.envMapIntensity;
+
+       child.castShadow = true;
+       child.receiveShadow = true;
      }
    });
  };
@@ -71,6 +74,7 @@ const gui = new dat.GUI();
    "/textures/environmentMaps/1/pz.jpg",
    "/textures/environmentMaps/1/nz.jpg",
  ]);
+ //  scene.background = environmentMap;
  scene.environment = environmentMap;
  /**
   * Models
@@ -136,6 +140,7 @@ const gui = new dat.GUI();
 
    //   setting the scale
    model4.scale.set(5, 5, 5);
+
    model7.scale.set(3, 5, 2);
    model8.scale.set(3, 3, 4);
 
@@ -170,6 +175,23 @@ const gui = new dat.GUI();
      const bedroll = gltf.scene.children[0];
      bedroll.position.set(x, 0, z);
      bedroll.scale.set(0.2, h, 0.2);
+     scene.add(bedroll);
+   });
+ }
+
+ // large grasses
+ for (let i = 0; i < 60; i++) {
+   const angle = Math.random() * Math.PI * 2; // Random angle
+   const radius = 4 + Math.random() * 6; // Random radius
+   const x = Math.cos(angle) * radius; // Get the x position using cosinus
+   const z = Math.sin(angle) * radius; // Get the z position using sinus
+
+   const h = Math.random() + 0.3;
+
+   gltfLoader.load("/gltf/grassLarge.glb", (gltf) => {
+     const bedroll = gltf.scene.children[0];
+     bedroll.position.set(x, 0, z);
+     bedroll.scale.set(0.4, h, 0.2);
      scene.add(bedroll);
    });
  }
@@ -268,6 +290,7 @@ const gui = new dat.GUI();
  moonLight.position.set(4, 5, -2);
  moonLight.castShadow = true;
  moonLight.shadow.camera.far = 15;
+ moonLight.shadow.mapSize.set(1024, 1024);
  moonLight.shadow.normalBias = 0.05;
  gui.add(moonLight, "intensity").min(0).max(1).step(0.001);
  gui.add(moonLight.position, "x").min(-5).max(5).step(0.001);
@@ -295,7 +318,9 @@ const gui = new dat.GUI();
    // Update renderer
    renderer.setSize(sizes.width, sizes.height);
    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-   renderer.outputEncoding = THREE.sRGBEncoding;
+   renderer.toneMapping = THREE.ACESFilmicToneMapping;
+   renderer.shadowMap.enabled = true;
+   renderer.shadowMap.type = THREE.PCFSoftShadowMap;
  });
 
  /**
